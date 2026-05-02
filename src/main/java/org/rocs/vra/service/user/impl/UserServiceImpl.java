@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
     private UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder;
-//    private LoginAttemptService loginAttemptService;
+    private LoginAttemptService loginAttemptService;
 //    private EmailService emailService;
 
     @Autowired
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                            EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-//        this.loginAttemptService = loginAttemptService;
+        this.loginAttemptService = loginAttemptService;
 //        this.emailService = emailService;
     }
 
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.error("User not found...");
             throw new UsernameNotFoundException("User not found...");
         } else {
-//            validateLoginAttempt(user);
+            validateLoginAttempt(user);
             user.setLastLoginDate(new Date());
             this.userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
@@ -73,17 +73,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-//    private void validateLoginAttempt(User user) {
-//        if(!user.isLocked()) {
-//            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
-//                user.setLocked(true);
-//            } else {
-//                user.setLocked(false);
-//            }
-//        } else {
-//            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
-//        }
-//    }
+    private void validateLoginAttempt(User user) {
+        if(!user.isLocked()) {
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+                user.setLocked(true);
+            } else {
+                user.setLocked(false);
+            }
+        } else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
+    }
 
     @Override
     public User register(User newUser)

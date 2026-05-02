@@ -43,8 +43,10 @@ dependencies {
     // String Utilities
     implementation 'org.apache.commons:commons-lang3:3.14.0'
 
-    // Email and Messaging
+    // Brute Force
     implementation 'com.google.guava:guava:33.1.0-jre'
+
+    // Email and Messaging
     implementation 'jakarta.mail:jakarta.mail-api:2.1.3'
     implementation 'org.eclipse.angus:jakarta.mail:2.0.0'
 

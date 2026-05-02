@@ -8,14 +8,26 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Service that tracks and manages failed login attempts per user.
+ */
 @Service
 public class LoginAttemptService {
 
+    /** Maximum allowed failed attempts before lockout. */
     public static final int MAX_NUMBER_OF_ATTEMPTS = 5;
+
+    /** Increment value added to attempt count on each failure. */
     public static final int ATTEMPT_INCREMENTS = 1;
+
+    /** The cache map that monitors the number of failed login attempts */
     private LoadingCache<String, Integer> loginAttemptCache;
 
-    // Initialize the guava cache
+    /**
+     * Constructs the login attempt service and initializes the cache.
+     * The cache expires entries 15 minutes after write, holds at most 100 entries,
+     * and returns 0 as the default value for a key that has not been loaded.
+     */
     public LoginAttemptService() {
         super();
         loginAttemptCache = CacheBuilder.newBuilder()
@@ -29,10 +41,16 @@ public class LoginAttemptService {
         });
     }
 
+    /**
+     * Removes a user from the login attempt cache.
+     */
     public void evictUserFromLoginAttemptCache(String username) {
         loginAttemptCache.invalidate(username);
     }
 
+    /**
+     * Increments the failed attempt counter for the specified user.
+     */
     public void addUserToLoginAttemptCache(String username) {
         int attempts = 0;
         try {
@@ -43,6 +61,10 @@ public class LoginAttemptService {
         loginAttemptCache.put(username, attempts);
     }
 
+
+    /**
+     * Checks whether the given user has exceeded the maximum allowed failed attempts.
+     */
     public boolean hasExceededMaxAttempts(String username) {
         try {
             return loginAttemptCache.get(username) >= MAX_NUMBER_OF_ATTEMPTS;
