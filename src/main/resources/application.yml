@@ -3,12 +3,12 @@ spring:
     name: video-rental-appl
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:oracleDB
-    username: system
+    username: vra
     password: Changeme0
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 server:
   port: 8080
 logging:
