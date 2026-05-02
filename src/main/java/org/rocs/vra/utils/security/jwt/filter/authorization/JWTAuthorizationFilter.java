@@ -19,14 +19,16 @@ import static org.rocs.vra.utils.security.constant.SecurityConstant.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
- * This authorizes or rejects any request once.
+ * Custom Spring Security filter that intercepts incoming HTTP requests to validate and
+ * authorize users based on a JWT (JSON Web Token).
+ * It typically extends OncePerRequestFilter or BasicAuthenticationFilter.
  * */
 @Component
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private JWTTokenProvider jwtTokenProvider;
 
-    public JwtAuthorizationFilter(JWTTokenProvider jwtTokenProvider) {
+    public JWTAuthorizationFilter(JWTTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -46,12 +48,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
             // if token prefix is present from the authorization header,
             // 1. obtain the token
+            String token = authorizationHeader.substring(TOKEN_PREFIX.length());
             // 2. get the username
+            String username = jwtTokenProvider.getSubject(token);
             // 3. check if the token with username is valid
             // 4. get the authorization from the user, its authorities and the request
             // 5. set the authentication to the security context holder
-            String token = authorizationHeader.substring(TOKEN_PREFIX.length());
-            String username = jwtTokenProvider.getSubject(token);
             if(jwtTokenProvider.isTokenValid(username, token) && SecurityContextHolder.getContext().getAuthentication()==null) {
                 List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
                 Authentication authentication = jwtTokenProvider.getAuthentication(username, authorities, request);

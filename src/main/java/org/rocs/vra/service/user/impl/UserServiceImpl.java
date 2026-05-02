@@ -5,7 +5,6 @@ import org.rocs.vra.domain.user.principal.UserPrincipal;
 import org.rocs.vra.exception.domain.EmailExistsException;
 import org.rocs.vra.exception.domain.EmailNotFoundException;
 import org.rocs.vra.exception.domain.UsernameExistsException;
-import org.rocs.vra.repository.customer.CustomerRepository;
 import org.rocs.vra.repository.user.UserRepository;
 import org.rocs.vra.service.email.EmailService;
 import org.rocs.vra.service.login.attempt.LoginAttemptService;
@@ -30,6 +29,12 @@ import java.util.List;
 
 import static org.rocs.vra.utils.security.enumeration.Role.ROLE_USER;
 
+/**
+ * Implementation of the UserService and Spring Security's UserDetailsService interfaces.
+ * This service class handles user-related business logic including authentication, registration,
+ * and user data management. It also serves as the bridge between Spring Security and the application's
+ * user data store by loading user details during authentication.
+ */
 @Service
 @Transactional
 @Qualifier("userDetailsService")
@@ -37,23 +42,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
     private UserRepository userRepository;
-    private CustomerRepository customerRepository;
     private BCryptPasswordEncoder passwordEncoder;
-    private LoginAttemptService loginAttemptService;
-
-    private EmailService emailService;
+//    private LoginAttemptService loginAttemptService;
+//    private EmailService emailService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           CustomerRepository customerRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
                            EmailService emailService) {
         this.userRepository = userRepository;
-        this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
-        this.loginAttemptService = loginAttemptService;
-        this.emailService = emailService;
+//        this.loginAttemptService = loginAttemptService;
+//        this.emailService = emailService;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.error("User not found...");
             throw new UsernameNotFoundException("User not found...");
         } else {
-            validateLoginAttempt(user);
+//            validateLoginAttempt(user);
             user.setLastLoginDate(new Date());
             this.userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
@@ -72,17 +73,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    private void validateLoginAttempt(User user) {
-        if(!user.isLocked()) {
-            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
-                user.setLocked(true);
-            } else {
-                user.setLocked(false);
-            }
-        } else {
-            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
-        }
-    }
+//    private void validateLoginAttempt(User user) {
+//        if(!user.isLocked()) {
+//            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+//                user.setLocked(true);
+//            } else {
+//                user.setLocked(false);
+//            }
+//        } else {
+//            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+//        }
+//    }
 
     @Override
     public User register(User newUser)
@@ -169,7 +170,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String password = generatePassword();
         user.setPassword(encodePassword(password));
         userRepository.save(user);
-        emailService.sendNewPasswordEmail(user.getCustomer().getFirstName(), password, user.getCustomer().getEmail());
+//        emailService.sendNewPasswordEmail(user.getCustomer().getFirstName(), password, user.getCustomer().getEmail());
     }
 
     @Override
