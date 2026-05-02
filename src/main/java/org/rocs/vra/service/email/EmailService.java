@@ -11,9 +11,17 @@ import org.springframework.stereotype.Service;
 
 import static org.rocs.vra.domain.email.constant.EmailConstant.*;
 
+/**
+ *  Service responsible for sending email notifications to users.
+ */
 @Service
 public class EmailService {
 
+    /**
+     * Sends a newly generated password to a user's email address.
+     * Creates a MIME message, connects to the Gmail SMTP server using the configured
+     * credentials, and transmits the message to the recipient.
+     */
     public void sendNewPasswordEmail(String firstName, String password, String email) throws MessagingException {
         Message message = createEmail(firstName, password, email);
         Transport smtpTransport = (Transport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
@@ -22,6 +30,11 @@ public class EmailService {
         smtpTransport.close();
     }
 
+    /**
+     * Constructs a MIME message containing the password notification.
+     * The message includes a personalized greeting, the new password,
+     * and a closing line from the support team.
+     */
     private Message createEmail(String firstName, String password, String email) throws MessagingException {
         Message message = new MimeMessage(getEmailSession());
         message.setFrom(new InternetAddress(FROM_EMAIL));
@@ -33,6 +46,11 @@ public class EmailService {
         return message;
     }
 
+    /**
+     * Creates and configures a JavaMail Session with Gmail SMTP properties.
+     * Sets the SMTP host, authentication, port, and STARTTLS requirements
+     * as defined in EmailConstant.
+     */
     private Session getEmailSession() {
         Properties properties = System.getProperties();
         properties.put(SMTP_HOST, GMAIL_SMTP_SERVER);

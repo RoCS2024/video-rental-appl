@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder;
     private LoginAttemptService loginAttemptService;
-//    private EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
-//        this.emailService = emailService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(Arrays.stream(ROLE_USER.getAuthorities()).toList());
         LOGGER.info("password: " + password);
         userRepository.save(user);
-//        emailService.sendNewPasswordEmail(newUser.getCustomer().getFirstName(), password, newUser.getCustomer().getEmail());
+        emailService.sendNewPasswordEmail(newUser.getCustomer().getFirstName(), password, newUser.getCustomer().getEmail());
         return null;
     }
 
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String password = generatePassword();
         user.setPassword(encodePassword(password));
         userRepository.save(user);
-//        emailService.sendNewPasswordEmail(user.getCustomer().getFirstName(), password, user.getCustomer().getEmail());
+        emailService.sendNewPasswordEmail(user.getCustomer().getFirstName(), password, user.getCustomer().getEmail());
     }
 
     @Override
